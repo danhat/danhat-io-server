@@ -18,4 +18,4 @@ const SkillSchema = new Schema({
 })
 
 
-module.exports = model('SKill', SkillSchema)
+module.exports = model('Skill', SkillSchema)

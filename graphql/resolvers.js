@@ -1,9 +1,15 @@
-const {gql} = require('apollo-server');
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js');
+const { finished } = require('stream/promises');
+const path = require('path')
+const fs = require('fs')
+
 const Project = require('../models/project');
 const Skill = require('../models/skill');
+const File = require('../models/file')
 
 
 module.exports = {
+  Upload: GraphQLUpload,
 
   Query: {
     async project(_, {ID}) {
@@ -14,11 +20,16 @@ module.exports = {
     },
     async skills(_, {}) {
       return await Skill.find()
+    },
+    async files(_, {}) {
+      return await File.find()
     }
   },
 
   Mutation: {
+    
     async createProject(_, {input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}}) {
+      
       const newProject = new Project({
         title: title,
         language: language,
@@ -28,7 +39,7 @@ module.exports = {
         demo: demo,
         hasSite: hasSite,
         hasNotebook: hasNotebook,
-        hasVideo: hasVideo
+        hasVideo: hasVideo,
       })
 
       const result = await newProject.save()
@@ -42,7 +53,6 @@ module.exports = {
     async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}}) {
       const updatedProject = (await Project.updateOne({_id: ID}, {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo})).modifiedCount
       return updatedProject
-
     },
 
 
@@ -77,7 +87,41 @@ module.exports = {
     async deleteSkill(_, {ID}) {
       const wasDeleted = (await Skill.deleteOne({_id: ID})).deletedCount
       return wasDeleted
-    }
+    },
+
+    
+    async uploadFile(_, {file}) {
+      const {createReadStream, filename, mimetype, encoding} = await file
+      const stream = createReadStream()
+
+      const pathName = path.join(__dirname, `../uploads/${filename}`)
+      console.log(pathName)
+
+      const out = fs.createWriteStream(pathName)
+      await stream.pipe(out)
+      await finished(out)
+
+
+      const newFile = new File({
+        filename: filename,
+        mimetype: mimetype,
+        encoding: encoding,
+        url: `${process.env.BASE_URL}/${filename}`
+      })
+
+      const result = await newFile.save()
+      
+      return {
+        id: result.id,
+        ...result._doc
+      }
+    },
+
+    async deleteFile(_, {ID}) {
+      const wasDeleted = (await File.deleteOne({_id: ID})).deletedCount
+      return wasDeleted
+    },
+
   }
 
 }

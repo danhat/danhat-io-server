@@ -1,8 +1,20 @@
-const {gql} = require('apollo-server')
-
+const {gql} = require('apollo-server-express')
+const File = require('../models/file')
 
 
 module.exports = gql`
+
+  scalar Upload
+
+  type File {
+    id: ID
+    filename: String
+    mimetype: String
+    encoding: String
+    url: String
+  }
+
+
   type Project {
     id: ID
     title: String
@@ -45,11 +57,13 @@ module.exports = gql`
     type: String
   }
 
+
   type Query {
     project(ID: ID!): Project!
     projects: [Project]
     skill(ID: ID!): Skill!
     skills: [Skill]
+    files: [File]
   }
 
 
@@ -60,6 +74,8 @@ module.exports = gql`
     createSkill(input: SkillInput!): Skill!
     editSkill(ID: ID, input: SkillInput!): Boolean
     deleteSkill(ID: ID!): Boolean
+    uploadFile(file: Upload!): File!
+    deleteFile(ID: ID!): Boolean
   }
 `
 
