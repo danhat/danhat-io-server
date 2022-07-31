@@ -1,4 +1,5 @@
 const {model, Schema} = require('mongoose')
+const File = require('../models/file')
 
 
 const ProjectSchema = new Schema({
@@ -32,7 +33,8 @@ const ProjectSchema = new Schema({
   },
   hasVideo: {
     type: Boolean
-  }
+  },
+  projectImage: File.schema
 })
 
 

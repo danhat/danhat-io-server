@@ -1,5 +1,5 @@
 const {gql} = require('apollo-server-express')
-const File = require('../models/file')
+
 
 
 module.exports = gql`
@@ -7,6 +7,14 @@ module.exports = gql`
   scalar Upload
 
   type File {
+    id: ID
+    filename: String
+    mimetype: String
+    encoding: String
+    url: String
+  }
+
+  input FileInput {
     id: ID
     filename: String
     mimetype: String
@@ -26,6 +34,7 @@ module.exports = gql`
     hasSite: String
     hasNotebook: String
     hasVideo: String
+    projectImage: File
   }
 
   input ProjectInput {
@@ -39,6 +48,7 @@ module.exports = gql`
     hasSite: String
     hasNotebook: String
     hasVideo: String
+    projectImage: FileInput
   }
 
   type Skill {
@@ -52,7 +62,6 @@ module.exports = gql`
   input SkillInput {
     id: ID
     name: String
-    description: String
     importance: String
     type: String
   }
@@ -63,13 +72,14 @@ module.exports = gql`
     projects: [Project]
     skill(ID: ID!): Skill!
     skills: [Skill]
-    files: [File]
+    file(ID: ID!): File!
+    files: [File] 
   }
 
 
   type Mutation{
-    createProject(input: ProjectInput!): Project!
-    updateProject(ID: ID, input: ProjectInput!): Boolean
+    createProject(input: ProjectInput!, file: Upload!): Project!
+    updateProject(ID: ID, input: ProjectInput, file: Upload): Boolean
     deleteProject(ID: ID!): Boolean
     createSkill(input: SkillInput!): Skill!
     editSkill(ID: ID, input: SkillInput!): Boolean

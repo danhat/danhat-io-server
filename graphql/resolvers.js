@@ -26,10 +26,29 @@ module.exports = {
     }
   },
 
-  Mutation: {
+  Mutation: {    
     
-    async createProject(_, {input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}}) {
-      
+    async createProject(_, {input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}, file}) {
+
+      const {createReadStream, filename, mimetype, encoding} = await file
+      const stream = createReadStream()
+
+      const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+      const out = fs.createWriteStream(pathName)
+      await stream.pipe(out)
+      await finished(out)
+
+
+      const newFile = new File({
+        filename: filename,
+        mimetype: mimetype,
+        encoding: encoding,
+        url: `${process.env.BASE_URL}/${filename}`
+      })
+
+      const image = await newFile.save()
+
       const newProject = new Project({
         title: title,
         language: language,
@@ -40,6 +59,12 @@ module.exports = {
         hasSite: hasSite,
         hasNotebook: hasNotebook,
         hasVideo: hasVideo,
+        projectImage: {
+          filename: filename,
+          mimetype: mimetype,
+          encoding: encoding,
+          url: `${process.env.BASE_URL}/${filename}`
+        }
       })
 
       const result = await newProject.save()
@@ -50,7 +75,23 @@ module.exports = {
       }
     },
 
-    async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}}) {
+    async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}, file}) {
+      if (file != null) {
+        const {createReadStream, filename, mimetype, encoding} = await file
+        const stream = createReadStream()
+
+        const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+        const out = fs.createWriteStream(pathName)
+        await stream.pipe(out)
+        await finished(out)
+        
+        const url = `${process.env.BASE_URL}/${filename}`
+
+        await Project.updateOne({_id: ID}, {projectImage: {filename, mimetype, encoding, url}})
+      }
+      
+
       const updatedProject = (await Project.updateOne({_id: ID}, {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo})).modifiedCount
       return updatedProject
     },
@@ -90,12 +131,11 @@ module.exports = {
     },
 
     
-    async uploadFile(_, {file}) {
+    uploadFile: async (_, {file}) => {
       const {createReadStream, filename, mimetype, encoding} = await file
       const stream = createReadStream()
 
       const pathName = path.join(__dirname, `../uploads/${filename}`)
-      console.log(pathName)
 
       const out = fs.createWriteStream(pathName)
       await stream.pipe(out)
@@ -116,6 +156,7 @@ module.exports = {
         ...result._doc
       }
     },
+    
 
     async deleteFile(_, {ID}) {
       const wasDeleted = (await File.deleteOne({_id: ID})).deletedCount
