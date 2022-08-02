@@ -15,7 +15,7 @@ async function startServer() {
     typeDefs,
     resolvers,
     csrfPrevention: true,
-    cache: 'bounded'
+    cache: 'bounded',
   });
 
 

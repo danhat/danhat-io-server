@@ -3,17 +3,18 @@ const {model, Schema} = require('mongoose')
 const SkillSchema = new Schema({
   name: {
     type: String,
-    trim: true
-  },
-  description: {
-    type: String,
+    required: true,
+    unique: true,
     trim: true
   },
   importance: {
-    type: Number
+    type: Number,
+    required: true
   },
   type: {
-    type: String
+    type: String,
+    required: true,
+    trim: true
   }
 })
 

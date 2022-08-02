@@ -5,34 +5,43 @@ const File = require('../models/file')
 const ProjectSchema = new Schema({
   title: {
     type: String,
+    unique: true,
+    required: true,
     trim: true
   },
   language: {
-    type: String
+    type: String,
+    trim: true
   },
   description: {
     type: String,
     trim: true
   },
   importance: {
-    type: Number
+    type: Number,
+    required: true
   },
   link:{
     type: String,
+    required: true,
     trim: true
   },
   demo: {
     type: String,
+    required: true,
     trim: true
   },
   hasSite: {
-    type: Boolean
+    type: Boolean,
+    required: true
   },
   hasNotebook: {
-    type: Boolean
+    type: Boolean,
+    required: true
   },
   hasVideo: {
-    type: Boolean
+    type: Boolean,
+    required: true
   },
   projectImage: File.schema
 })
