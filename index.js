@@ -33,7 +33,7 @@ async function startServer() {
   mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
   .then( () => {
     console.log('Successfully connected to mongodb')
-    return (new Promise(r => app.listen({ port: process.env.PORT }, r)))
+    return (new Promise(r => app.listen({ port: process.env.PORT || 4000}, r)))
   }).catch(error => {
     console.error(error.message)
   })
