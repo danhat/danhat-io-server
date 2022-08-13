@@ -7,6 +7,7 @@ require('dotenv').config()
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 
+const {ApolloServerPluginLandingPageLocalDefault} = require('apollo-server-core');
 
 
 async function startServer() {
@@ -16,7 +17,10 @@ async function startServer() {
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
-    introspection: true
+    introspection: true,
+    plugins: [
+      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
+    ],
   });
 
 
