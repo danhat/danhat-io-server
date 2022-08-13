@@ -48,7 +48,7 @@ module.exports = gql`
     hasSite: String!
     hasNotebook: String!
     hasVideo: String!
-    projectImage: File!
+    projectImage: FileInput!
   }
 
   type Skill {
