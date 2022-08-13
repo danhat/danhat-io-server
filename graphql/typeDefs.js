@@ -52,14 +52,14 @@ module.exports = gql`
   }
 
   type Skill {
-    id: ID!
+    id: ID
     name: String!
     importance: String!
     type: String!
   }
 
   input SkillInput {
-    id: ID!
+    id: ID
     name: String!
     importance: String!
     type: String!

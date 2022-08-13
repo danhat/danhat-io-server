@@ -17,10 +17,7 @@ async function startServer() {
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
-    introspection: true,
-    // plugins: [
-    //   ApolloServerPluginLandingPageLocalDefault({ embed: true }),
-    // ],
+    introspection: true
   });
 
 
