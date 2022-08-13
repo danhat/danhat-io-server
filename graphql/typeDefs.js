@@ -7,7 +7,7 @@ module.exports = gql`
   scalar Upload
 
   type File {
-    id: ID!
+    id: ID
     filename: String
     mimetype: String
     encoding: String
@@ -15,7 +15,7 @@ module.exports = gql`
   }
 
   input FileInput {
-    id: ID!
+    id: ID
     filename: String
     mimetype: String
     encoding: String
@@ -24,7 +24,7 @@ module.exports = gql`
 
 
   type Project {
-    id: ID!
+    id: ID
     title: String!
     language: String
     description: String
@@ -38,7 +38,7 @@ module.exports = gql`
   }
 
   input ProjectInput {
-    id: ID!
+    id: ID
     title: String!
     language: String
     description: String
