@@ -39,16 +39,16 @@ module.exports = gql`
 
   input ProjectInput {
     id: ID
-    title: String!
+    title: String
     language: String
     description: String
-    importance: String!
-    link: String!
-    demo: String!
-    hasSite: String!
-    hasNotebook: String!
-    hasVideo: String!
-    projectImage: FileInput!
+    importance: String
+    link: String
+    demo: String
+    hasSite: String
+    hasNotebook: String
+    hasVideo: String
+    projectImage: FileInput
   }
 
   type Skill {
@@ -60,9 +60,9 @@ module.exports = gql`
 
   input SkillInput {
     id: ID
-    name: String!
-    importance: String!
-    type: String!
+    name: String
+    importance: String
+    type: String
   }
 
 
