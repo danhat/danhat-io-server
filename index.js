@@ -16,6 +16,9 @@ async function startServer() {
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
+    cors: {
+      origin: [process.env.BASE_URL, 'https://studio.apollographql.com']
+    },
     introspection: true
   });
 
@@ -25,19 +28,12 @@ async function startServer() {
   const app = express();
 
   
-  
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
-  app.use(cors({
-    credentials: true,
-    origin: [process.env.BASE_URL, 'https://studio.apollograpqhl.com']
-  }))
   
 
   server.applyMiddleware({
-    app,
-    path: '/graphql',
-    cors: false
+    app
   });
   
 
