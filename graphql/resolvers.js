@@ -44,7 +44,7 @@ module.exports = {
         filename: filename,
         mimetype: mimetype,
         encoding: encoding,
-        url: `${process.env.BASE_URL}${filename}`
+        url: `${process.env.BASE_URL}/${filename}`
       })
 
       const image = await newFile.save()
@@ -63,7 +63,7 @@ module.exports = {
           filename: filename,
           mimetype: mimetype,
           encoding: encoding,
-          url: `${process.env.BASE_URL}${filename}`
+          url: `${process.env.BASE_URL}/${filename}`
         }
       })
 
@@ -86,7 +86,7 @@ module.exports = {
         await stream.pipe(out)
         await finished(out)
         
-        const url = `${process.env.BASE_URL}${filename}`
+        const url = `${process.env.BASE_URL}/${filename}`
 
         await Project.updateOne({_id: ID}, {projectImage: {filename, mimetype, encoding, url}})
       }
@@ -146,7 +146,7 @@ module.exports = {
         filename: filename,
         mimetype: mimetype,
         encoding: encoding,
-        url: `${process.env.BASE_URL}${filename}`
+        url: `${process.env.BASE_URL}/${filename}`
       })
 
       const result = await newFile.save()

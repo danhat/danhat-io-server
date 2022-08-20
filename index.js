@@ -38,7 +38,8 @@ async function startServer() {
 
   server.applyMiddleware({
     app,
-    cors: corsOptions
+    cors: corsOptions,
+    path: '/graphql'
   });
   
 
