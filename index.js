@@ -6,6 +6,7 @@ const {join} = require('path')
 require('dotenv').config()
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
+const cors = require('cors')
 
 
 
