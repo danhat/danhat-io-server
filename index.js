@@ -7,7 +7,6 @@ require('dotenv').config()
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 
-const {ApolloServerPluginLandingPageLocalDefault} = require('apollo-server-core');
 
 
 async function startServer() {
@@ -25,18 +24,20 @@ async function startServer() {
 
   const app = express();
 
-  const corsOptions = {
-    origin: [process.env.BASE_URL, 'https://studio.apollograpqhl.com']
-  }
+  
   
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
+  app.use(cors({
+    credentials: true,
+    origin: [process.env.BASE_URL, 'https://studio.apollograpqhl.com']
+  }))
   
 
   server.applyMiddleware({
     app,
-    cors: corsOptions,
-    path: '/graphql'
+    path: '/graphql',
+    cors: false
   });
   
 
