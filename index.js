@@ -28,19 +28,18 @@ async function startServer() {
   const app = express();
 
   const corsOptions = {
-    origin: process.env.BASE_URL, 
-    credentials: false
+    origin: [process.env.BASE_URL, 'https://studio.apollographql.com']
   }
 
   
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
-  app.use(cors(corsOptions))
   
 
   server.applyMiddleware({
     app,
-    cors: false
+    cors: corsOptions,
+    path: "/graphql"
   });
   
 
