@@ -34,12 +34,11 @@ async function startServer() {
   
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
-  
+  app.use(cors(corsOptions));
 
   server.applyMiddleware({
     app,
-    cors: corsOptions,
-    path: "/graphql"
+    cors: corsOptions
   });
   
 
