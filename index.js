@@ -24,12 +24,20 @@ async function startServer() {
   await server.start();
 
   const app = express();
+
+  const corsOptions = {
+    origin: [process.env.BASE_URL, 'https://studio.apollograpqhl.com']
+  }
   
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
   
 
-  server.applyMiddleware({app});
+  server.applyMiddleware({
+    app,
+    cors: corsOptions,
+    path: '/graphql'
+  });
   
 
   mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
