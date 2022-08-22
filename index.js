@@ -6,7 +6,6 @@ const {join} = require('path')
 require('dotenv').config()
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
-const cors = require('cors')
 
 
 
@@ -17,9 +16,6 @@ async function startServer() {
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
-    // cors: {
-    //   origin: [process.env.BASE_URL, 'https://studio.apollographql.com']
-    // },
     introspection: true
   });
 
@@ -28,14 +24,13 @@ async function startServer() {
 
   const app = express();
 
-  const corsOptions = {
-    origin: [process.env.BASE_URL, 'https://studio.apollographql.com']
-  }
 
+  const corsOptions = {
+    origin: [process.env.BASE_URL, "https://studio.apollographql.com"]
+  };
   
   app.use(graphqlUploadExpress())
   app.use(express.static(join(__dirname, './uploads')))
-  app.use(cors(corsOptions));
 
   server.applyMiddleware({
     app,
