@@ -1,10 +1,10 @@
-const GraphQLUpload = require('graphql-upload/GraphQLUpload.js');
-const { finished } = require('stream/promises');
+const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
+const { finished } = require('stream/promises')
 const path = require('path')
 const fs = require('fs')
 
-const Project = require('../models/project');
-const Skill = require('../models/skill');
+const Project = require('../models/project')
+const Skill = require('../models/skill')
 const File = require('../models/file')
 
 

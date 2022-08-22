@@ -26,7 +26,9 @@ async function startServer() {
 
 
   const corsOptions = {
-    origin: [process.env.BASE_URL, "https://studio.apollographql.com"]
+    origin: [process.env.DANHAT_URL, "https://studio.apollographql.com"],
+    //origin: '*',
+    credentials: true
   };
   
   app.use(graphqlUploadExpress())
@@ -36,7 +38,7 @@ async function startServer() {
     app,
     cors: corsOptions,
     path: '/graphql'
-  });
+  }); 
   
 
   mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
