@@ -11,7 +11,7 @@ const SkillSchema = new Schema({
     type: Number,
     required: true
   },
-  type: {
+  skillType: {
     type: String,
     required: true,
     trim: true

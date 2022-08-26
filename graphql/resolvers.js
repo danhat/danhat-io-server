@@ -102,12 +102,12 @@ module.exports = {
       return wasDeleted
     },
 
-    async createSkill(_, {input: {name, description, importance, type}}) {
+    async createSkill(_, {input: {name, description, importance, skillType}}) {
       const newSkill = new Skill({
         name: name,
         description: description,
         importance: importance,
-        type: type
+        skillType: skillType
       })
 
       const result = await newSkill.save()
@@ -118,8 +118,8 @@ module.exports = {
       }
     },
 
-    async editSkill(_, {ID, input: {name, description, importance, type}}) {
-      const editedSkill = (await Skill.updateOne({_id: ID}, {name, description, importance, type})).modifiedCount
+    async editSkill(_, {ID, input: {name, description, importance, skillType}}) {
+      const editedSkill = (await Skill.updateOne({_id: ID}, {name, description, importance, skillType})).modifiedCount
       return editedSkill
 
     },
