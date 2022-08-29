@@ -49,12 +49,17 @@ module.exports = {
       await stream.pipe(out)
       await finished(out)
 
+      cloudinary.v2.uploader.upload(pathName,
+        {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+        function(error, result) {
+          console.log(result)
+        })
 
       const newFile = new File({
         filename: filename,
         mimetype: mimetype,
         encoding: encoding,
-        url: `${process.env.BASE_URL}/${filename}`
+        url: cloudinary.url(filename)
       })
 
       const image = await newFile.save()
@@ -69,12 +74,13 @@ module.exports = {
         hasSite: hasSite,
         hasNotebook: hasNotebook,
         hasVideo: hasVideo,
-        projectImage: {
-          filename: filename,
-          mimetype: mimetype,
-          encoding: encoding,
-          url: `${process.env.BASE_URL}/${filename}`
-        }
+        projectImage: image
+        // projectImage: {
+        //   filename: filename,
+        //   mimetype: mimetype,
+        //   encoding: encoding,
+        //   url: `${process.env.BASE_URL}/${filename}`
+        // }
       })
 
       const result = await newProject.save()
@@ -87,6 +93,11 @@ module.exports = {
 
     async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}, file}) {
       if (file != null) {
+        // ***TO-DO***
+        // delete old file from cloudinary here:
+
+
+        
         const {createReadStream, filename, mimetype, encoding} = await file
         const stream = createReadStream()
 
@@ -95,8 +106,14 @@ module.exports = {
         const out = fs.createWriteStream(pathName)
         await stream.pipe(out)
         await finished(out)
+
+        cloudinary.v2.uploader.upload(pathName,
+          {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+          function(error, result) {
+            console.log(result)
+          })
         
-        const url = `${process.env.BASE_URL}/${filename}`
+        const url = cloudinary.url(filename)
 
         await Project.updateOne({_id: ID}, {projectImage: {filename, mimetype, encoding, url}})
       }
