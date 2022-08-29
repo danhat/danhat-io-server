@@ -2,10 +2,20 @@ const GraphQLUpload = require('graphql-upload/GraphQLUpload.js')
 const { finished } = require('stream/promises')
 const path = require('path')
 const fs = require('fs')
+const cloudinary = require('cloudinary')
 
 const Project = require('../models/project')
 const Skill = require('../models/skill')
 const File = require('../models/file')
+
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true 
+});
+
 
 
 module.exports = {
@@ -142,23 +152,32 @@ module.exports = {
       await finished(out)
 
 
+      cloudinary.v2.uploader.upload(pathName,
+        {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+        function(error, result) {
+          console.log(result)
+        })
+
       const newFile = new File({
         filename: filename,
         mimetype: mimetype,
         encoding: encoding,
-        url: `${process.env.BASE_URL}/${filename}`
+        url: cloudinary.url(filename)
       })
 
       const result = await newFile.save()
-      
+
       return {
         id: result.id,
         ...result._doc
       }
+
     },
     
 
-    async deleteFile(_, {ID}) {
+    async deleteFile(_, {ID, input: {filename}}) {
+      cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${filename}`, function(error,result) {
+        console.log(result, error) });
       const wasDeleted = (await File.deleteOne({_id: ID})).deletedCount
       return wasDeleted
     },

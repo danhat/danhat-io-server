@@ -84,7 +84,7 @@ module.exports = gql`
     editSkill(ID: ID, input: SkillInput!): Boolean
     deleteSkill(ID: ID!): Boolean
     uploadFile(file: Upload!): File!
-    deleteFile(ID: ID!): Boolean
+    deleteFile(ID: ID!, input: FileInput!): Boolean
   }
 `
 
