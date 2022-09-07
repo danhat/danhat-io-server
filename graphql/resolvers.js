@@ -31,6 +31,9 @@ module.exports = {
     async skills(_, {}) {
       return await Skill.find()
     },
+    async file(_, {ID}) {
+      return await File.findById(ID)
+    },
     async files(_, {}) {
       return await File.find()
     }
@@ -75,12 +78,6 @@ module.exports = {
         hasNotebook: hasNotebook,
         hasVideo: hasVideo,
         projectImage: image
-        // projectImage: {
-        //   filename: filename,
-        //   mimetype: mimetype,
-        //   encoding: encoding,
-        //   url: `${process.env.BASE_URL}/${filename}`
-        // }
       })
 
       const result = await newProject.save()
@@ -93,9 +90,11 @@ module.exports = {
 
     async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}, file}) {
       if (file != null) {
-        // ***TO-DO***
-        // delete old file from cloudinary here:
-
+        // delete from cloudinary
+        const toDelete = (await Project.findById(ID)).projectImage
+        cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+          console.log(result, error) });
+        const wasDeleted = (await File.deleteOne({_id: ID})).deletedCount
 
         
         const {createReadStream, filename, mimetype, encoding} = await file
@@ -117,7 +116,6 @@ module.exports = {
 
         await Project.updateOne({_id: ID}, {projectImage: {filename, mimetype, encoding, url}})
       }
-      
 
       const updatedProject = (await Project.updateOne({_id: ID}, {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo})).modifiedCount
       return updatedProject
@@ -125,11 +123,14 @@ module.exports = {
 
 
     async deleteProject(_, {ID}) {
+      const toDelete = (await Project.findById(ID)).projectImage
+      cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+        console.log(result, error) });
       const wasDeleted = (await Project.deleteOne({_id: ID})).deletedCount
       return wasDeleted
     },
 
-    async createSkill(_, {input: {name, description, importance, skillType}}) {
+    async addSkill(_, {input: {name, description, importance, skillType}}) {
       const newSkill = new Skill({
         name: name,
         description: description,
@@ -192,8 +193,9 @@ module.exports = {
     },
     
 
-    async deleteFile(_, {ID, input: {filename}}) {
-      cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${filename}`, function(error,result) {
+    async deleteFile(_, {ID}) {  
+      const toDelete = await File.findById(ID)
+      cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
         console.log(result, error) });
       const wasDeleted = (await File.deleteOne({_id: ID})).deletedCount
       return wasDeleted

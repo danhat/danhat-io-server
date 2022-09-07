@@ -6,8 +6,23 @@ const {join} = require('path')
 require('dotenv').config()
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
+const winston = require('winston')
 
 
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize({all: true})
+      )
+    }),
+    new winston.transports.File({filename: 'error.log', level: 'error'})
+  ],
+  exceptionHandlers: [
+    new winston.transports.File({filename: 'exceptions.log'})
+  ]
+})
 
 
 async function startServer() {
@@ -28,7 +43,6 @@ async function startServer() {
 
   const corsOptions = {
     origin: [process.env.DANHAT_URL, "https://studio.apollographql.com"],
-    //origin: '*',
     credentials: true
   };
   
@@ -44,13 +58,16 @@ async function startServer() {
 
   mongoose.connect(process.env.DATABASE_URL, {useNewUrlParser: true})
   .then( () => {
-    console.log('Successfully connected to mongodb')
+    //console.log('Successfully connected to mongodb atlas')
+    logger.info('Connected to mongodb atlas')
     return (new Promise(r => app.listen({ port: process.env.PORT || 4000}, r)))
   }).catch(error => {
-    console.error(error.message)
+    //console.error(error.message)
+    logger.error(error.message)
   })
   .then((res) => {
-    console.log(`Server ready at ${process.env.BASE_URL}${server.graphqlPath}`)
+    //console.log(`Server ready at ${process.env.BASE_URL}${server.graphqlPath}`)
+    logger.info(`Server ready at ${process.env.BASE_URL}${server.graphqlPath}`)
   })
 
 

@@ -80,11 +80,11 @@ module.exports = gql`
     createProject(input: ProjectInput!, file: Upload!): Project!
     updateProject(ID: ID, input: ProjectInput, file: Upload): Boolean
     deleteProject(ID: ID!): Boolean
-    createSkill(input: SkillInput!): Skill!
+    addSkill(input: SkillInput!): Skill!
     editSkill(ID: ID, input: SkillInput!): Boolean
     deleteSkill(ID: ID!): Boolean
     uploadFile(file: Upload!): File!
-    deleteFile(ID: ID!, input: FileInput!): Boolean
+    deleteFile(ID: ID!): Boolean
   }
 `
 
