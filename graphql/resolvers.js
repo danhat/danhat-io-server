@@ -94,8 +94,7 @@ module.exports = {
         const toDelete = (await Project.findById(ID)).projectImage
         cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
           console.log(result, error) });
-        (await File.deleteOne({_id: toDelete.id}))
-
+        //(await File.deleteOne({_id: toDelete.id}))
         
         const {createReadStream, filename, mimetype, encoding} = await file
         const stream = createReadStream()
