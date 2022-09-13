@@ -52,17 +52,19 @@ module.exports = {
       await stream.pipe(out)
       await finished(out)
 
+      const strippedFilename = path.parse(filename).name
+
       cloudinary.v2.uploader.upload(pathName,
-        {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+        {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
         function(error, result) {
-          console.log(result)
+          console.log(result, error)
         })
 
       const newFile = new File({
-        filename: filename,
+        filename: strippedFilename,
         mimetype: mimetype,
         encoding: encoding,
-        url: cloudinary.url(filename)
+        url: cloudinary.url(strippedFilename)
       })
 
       const image = await newFile.save()
@@ -105,15 +107,17 @@ module.exports = {
         await stream.pipe(out)
         await finished(out)
 
+        const strippedFilename = path.parse(filename).name
+
         cloudinary.v2.uploader.upload(pathName,
-          {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+          {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
           function(error, result) {
-            console.log(result)
+            console.log(result, error)
           })
         
         const url = cloudinary.url(filename)
 
-        await Project.updateOne({_id: ID}, {projectImage: {filename, mimetype, encoding, url}})
+        await Project.updateOne({_id: ID}, {projectImage: {strippedFilename, mimetype, encoding, url}})
       }
 
       const updatedProject = (await Project.updateOne({_id: ID}, {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo})).modifiedCount
@@ -171,18 +175,18 @@ module.exports = {
       await stream.pipe(out)
       await finished(out)
 
-
+      const strippedFilename = path.parse(filename).name
       cloudinary.v2.uploader.upload(pathName,
-        {public_id: filename, folder: process.env.CLOUDINARY_FOLDER}, 
+        {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
         function(error, result) {
-          console.log(result)
+          console.log(result, error)
         })
 
       const newFile = new File({
-        filename: filename,
+        filename: strippedFilename,
         mimetype: mimetype,
         encoding: encoding,
-        url: cloudinary.url(filename)
+        url: cloudinary.url(strippedFilename)
       })
 
       const result = await newFile.save()
