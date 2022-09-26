@@ -7,6 +7,8 @@ const cloudinary = require('cloudinary')
 const Project = require('../models/project')
 const Skill = require('../models/skill')
 const File = require('../models/file')
+const Info = require('../models/info')
+const AboutCard = require('../models/aboutCard')
 
 
 cloudinary.config({ 
@@ -36,6 +38,18 @@ module.exports = {
     },
     async files(_, {}) {
       return await File.find()
+    },
+    // async info(_, {Name}) {
+    //   return await Info.findOne({'name': Name})
+    // },
+    async infos(_, {}) {
+      return await Info.find()
+    },
+    async aboutCard(_, {ID}) {
+      return await AboutCard.findById(ID)
+    },
+    async aboutCards(_, {}) {
+      return await AboutCard.find()
     }
   },
 
@@ -60,11 +74,12 @@ module.exports = {
           console.log(result, error)
         })
 
+      const new_url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
       const newFile = new File({
         filename: strippedFilename,
         mimetype: mimetype,
         encoding: encoding,
-        url: cloudinary.url(strippedFilename)
+        url: new_url
       })
 
       const image = await newFile.save()
@@ -89,6 +104,8 @@ module.exports = {
         ...result._doc
       }
     },
+
+
 
     async updateProject(_, {ID, input: {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo}, file}) {
       if (file != null) {
@@ -115,7 +132,7 @@ module.exports = {
             console.log(result, error)
           })
         
-        const url = cloudinary.url(filename)
+        const url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
 
         await Project.updateOne({_id: ID}, {projectImage: {strippedFilename, mimetype, encoding, url}})
       }
@@ -123,6 +140,8 @@ module.exports = {
       const updatedProject = (await Project.updateOne({_id: ID}, {title, language, description, importance, link, demo, hasSite, hasNotebook, hasVideo})).modifiedCount
       return updatedProject
     },
+
+
 
 
     async deleteProject(_, {ID}) {
@@ -152,6 +171,9 @@ module.exports = {
       }
     },
 
+
+
+
     async editSkill(_, {ID, input: {name, description, importance, skillType}}) {
       const editedSkill = (await Skill.updateOne({_id: ID}, {name, description, importance, skillType})).modifiedCount
       return editedSkill
@@ -159,10 +181,245 @@ module.exports = {
     },
 
 
+
+
     async deleteSkill(_, {ID}) {
       const wasDeleted = (await Skill.deleteOne({_id: ID})).deletedCount
       return wasDeleted
     },
+
+
+
+
+    async addInfo(_, {input: {intro, about}, file}) {
+      let savedFiles = {}
+
+      for (let i = 0; i < file.length; i++) {
+        const {createReadStream, filename, mimetype, encoding} = await file[i]
+        const stream = createReadStream()
+
+        const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+        const out = fs.createWriteStream(pathName)
+        await stream.pipe(out)
+        await finished(out)
+
+        const strippedFilename = path.parse(filename).name
+
+        cloudinary.v2.uploader.upload(pathName,
+          {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
+          function(error, result) {
+            console.log(result, error)
+          })
+
+        let new_url 
+        if (mimetype == 'application/pdf') 
+          new_url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/fl_attachment/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
+        else
+          new_url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
+          
+        const newFile = new File({
+          filename: strippedFilename,
+          mimetype: mimetype,
+          encoding: encoding,
+          url: new_url
+        })
+
+        const fileToSave = await newFile.save()
+        savedFiles[strippedFilename] = await fileToSave
+      }
+      
+
+
+      const newInfo = new Info({
+        intro: intro,
+        about: about,
+        headshot: savedFiles['headshot'],
+        cv: savedFiles['cv']
+      })
+
+      const result = await newInfo.save()
+
+      return {
+        id: result.id,
+        ...result._doc
+      }
+    },
+
+
+
+
+    async editInfo(_, {ID, input: {intro, about}, file}) {
+
+
+      ///**********
+      ///finish edit files
+      ///*******************
+      if (file != null) {
+        // delete from cloudinary
+        const toDelete = (await Info.findById(ID)).file
+        cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+          console.log(result, error) });
+        //(await File.deleteOne({_id: toDelete.id}))
+        
+        const {createReadStream, filename, mimetype, encoding} = await file
+        const stream = createReadStream()
+
+        const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+        const out = fs.createWriteStream(pathName)
+        await stream.pipe(out)
+        await finished(out)
+
+        const strippedFilename = path.parse(filename).name
+
+        cloudinary.v2.uploader.upload(pathName,
+          {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
+          function(error, result) {
+            console.log(result, error)
+          })
+        
+        const url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
+
+        await Info.updateOne({_id: ID}, {file: {strippedFilename, mimetype, encoding, url}})
+
+      }
+
+      const updatedInfo = (await Info.updateOne({_id: ID}, {intro, about})).modifiedCount
+      return updatedInfo
+    },
+
+
+
+
+    async deleteInfo(_, {ID}) {
+
+      const toDelete = (await Info.findById(ID))
+
+      if (toDelete.headshot != null) {
+        cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.headshot.filename}`, function(error,result) {
+          console.log(result, error) });
+  
+        (await File.deleteOne({_id: toDelete.headshot.id}))
+      }
+
+      if (toDelete.cv != null) {
+        cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.cv.filename}`, function(error,result) {
+          console.log(result, error) });
+  
+        (await File.deleteOne({_id: toDelete.cv.id}))
+      }
+
+      // const toDelete2 = (await Info.findById(ID)).file
+      // cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+      //   console.log(result, error) });
+
+      // (await File.deleteOne({_id: toDelete.id}))
+
+      const wasDeleted = (await Info.deleteOne({_id: ID})).deletedCount
+      return wasDeleted
+    },
+
+
+
+
+    async addAboutCard(_, {input: {title, detail}, file}) {
+
+      const {createReadStream, filename, mimetype, encoding} = await file
+      const stream = createReadStream()
+
+      const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+      const out = fs.createWriteStream(pathName)
+      await stream.pipe(out)
+      await finished(out)
+
+      const strippedFilename = path.parse(filename).name
+
+      cloudinary.v2.uploader.upload(pathName,
+        {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
+        function(error, result) {
+          console.log(result, error)
+        })
+
+      const new_url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
+      const newFile = new File({
+        filename: strippedFilename,
+        mimetype: mimetype,
+        encoding: encoding,
+        url: new_url
+      })
+
+      const image = await newFile.save()
+
+      const newCard = new AboutCard({
+        title: title,
+        detail: detail,
+        image: image
+      })
+
+      const result = await newCard.save()
+
+      return {
+        id: result.id,
+        ...result._doc
+      }
+    },
+
+
+
+    async editAboutCard(_, {ID, input: {title, detail}, file}) {
+      if (file != null) {
+        // delete from cloudinary
+        const toDelete = (await Project.findById(ID)).projectImage
+        cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+          console.log(result, error) });
+        //(await File.deleteOne({_id: toDelete.id}))
+        
+        const {createReadStream, filename, mimetype, encoding} = await file
+        const stream = createReadStream()
+
+        const pathName = path.join(__dirname, `../uploads/${filename}`)
+
+        const out = fs.createWriteStream(pathName)
+        await stream.pipe(out)
+        await finished(out)
+
+        const strippedFilename = path.parse(filename).name
+
+        cloudinary.v2.uploader.upload(pathName,
+          {public_id: strippedFilename, folder: process.env.CLOUDINARY_FOLDER}, 
+          function(error, result) {
+            console.log(result, error)
+          })
+        
+        const url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
+
+        await AboutCard.updateOne({_id: ID}, {image: {strippedFilename, mimetype, encoding, url}})
+      }
+
+      const updatedCard = (await AboutCard.updateOne({_id: ID}, {title, detail})).modifiedCount
+      return updatedCard
+    },
+
+
+
+
+    async deleteAboutCard(_, {ID}) {
+      const toDelete = (await AboutCard.findById(ID)).image
+      cloudinary.v2.uploader.destroy(`${process.env.CLOUDINARY_FOLDER}/${toDelete.filename}`, function(error,result) {
+        console.log(result, error) });
+
+      (await File.deleteOne({_id: toDelete.id}))
+
+      const wasDeleted = (await ABoutCard.deleteOne({_id: ID})).deletedCount
+      return wasDeleted
+    },
+
+
+
+
+
 
     
     uploadFile: async (_, {file}) => {
@@ -182,11 +439,12 @@ module.exports = {
           console.log(result, error)
         })
 
+      const new_url = `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload/${process.env.CLOUDINARY_FOLDER}/${strippedFilename}`
       const newFile = new File({
         filename: strippedFilename,
         mimetype: mimetype,
         encoding: encoding,
-        url: cloudinary.url(strippedFilename)
+        url: new_url
       })
 
       const result = await newFile.save()
@@ -198,6 +456,7 @@ module.exports = {
 
     },
     
+
 
     async deleteFile(_, {ID}) {  
       const toDelete = await File.findById(ID)
