@@ -1,4 +1,5 @@
 const {model, Schema} = require('mongoose')
+const File = require('../models/file')
 
 const SkillSchema = new Schema({
   name: {
@@ -15,7 +16,8 @@ const SkillSchema = new Schema({
     type: String,
     required: true,
     trim: true
-  }
+  },
+  skillImage: File.schema
 })
 
 

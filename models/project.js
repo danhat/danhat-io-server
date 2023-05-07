@@ -43,6 +43,7 @@ const ProjectSchema = new Schema({
     type: Boolean,
     required: true
   },
+  tags: [String],
   projectImage: File.schema
 })
 

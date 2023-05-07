@@ -34,6 +34,7 @@ module.exports = gql`
     hasSite: String!
     hasNotebook: String!
     hasVideo: String!
+    tags: [String]!
     projectImage: File!
   }
 
@@ -48,6 +49,7 @@ module.exports = gql`
     hasSite: String
     hasNotebook: String
     hasVideo: String
+    tags: [String]!
     projectImage: FileInput
   }
 
@@ -56,6 +58,7 @@ module.exports = gql`
     name: String!
     importance: String!
     skillType: String!
+    skillImage: File!
   }
 
   input SkillInput {
@@ -63,6 +66,7 @@ module.exports = gql`
     name: String
     importance: String
     skillType: String
+    skillImage: FileInput
   }
 
   type Info {
@@ -75,7 +79,7 @@ module.exports = gql`
 
   input InfoInput {
     id: ID
-    intro: String!
+    intro: String
     about: String
     headshot: FileInput
     cv: FileInput
@@ -90,8 +94,8 @@ module.exports = gql`
 
   input AboutCardInput {
     id: ID
-    title: String!
-    detail: String!
+    title: String
+    detail: String
     image: FileInput
   }
 
@@ -113,8 +117,8 @@ module.exports = gql`
     createProject(input: ProjectInput!, file: Upload!): Project!
     updateProject(ID: ID, input: ProjectInput, file: Upload): Boolean
     deleteProject(ID: ID!): Boolean
-    addSkill(input: SkillInput!): Skill!
-    editSkill(ID: ID, input: SkillInput!): Boolean
+    addSkill(input: SkillInput!, file: Upload!): Skill!
+    editSkill(ID: ID, input: SkillInput!, file: Upload): Boolean
     deleteSkill(ID: ID!): Boolean
     uploadFile(file: Upload!): File!
     deleteFile(ID: ID!): Boolean
