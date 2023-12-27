@@ -1,5 +1,5 @@
-const {model, Schema} = require('mongoose')
-const File = require('../models/file')
+import {model, Schema} from 'mongoose'
+import File from '../models/file.js'
 
 
 const ProjectSchema = new Schema({
@@ -48,4 +48,4 @@ const ProjectSchema = new Schema({
 })
 
 
-module.exports = model('Project', ProjectSchema)
+export default model('Project', ProjectSchema)

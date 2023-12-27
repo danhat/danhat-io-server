@@ -1,5 +1,5 @@
-const {model, Schema} = require('mongoose')
-const File = require('../models/file')
+import {model, Schema} from 'mongoose'
+import File from '../models/file.js'
 
 const InfoSchema = new Schema({
   intro: {
@@ -19,4 +19,4 @@ const InfoSchema = new Schema({
 })
 
 
-module.exports = model('Info', InfoSchema)
+export default model('Info', InfoSchema)

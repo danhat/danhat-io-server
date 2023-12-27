@@ -1,16 +1,10 @@
-const {model, Schema} = require('mongoose')
+import {model, Schema} from 'mongoose'
 
 const FileSchema = new Schema({
   filename: {
     type: String,
     unique: true,
     trim: true
-  },
-  mimetype: {
-    type: String
-  },
-  encoding: {
-    type: String
   },
   url: {
     type: String,
@@ -19,6 +13,6 @@ const FileSchema = new Schema({
 })
 
 
-module.exports = model('File', FileSchema)
+export default model('File', FileSchema)
 
 
